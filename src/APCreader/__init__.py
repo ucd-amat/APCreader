@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import LinearNDInterpolator
 
-def parse_APC_data(file_name):
+def parse_APC_data(file_name, x = "Thrust_lbf", y = "V_fps"):
     APC_keys = ["V_fps","J","Pe","Ct", "Cp", "PWR_hp", "Torque_inlbf", "Thrust_lbf", "PWR_W", "Torque_Nm", "Thrust_N", "THR/PWR_gpW", "Mach", "Reyn", "FOM"]
     data = {key:[] for key in ["RPM"]+APC_keys}
     # read filename
@@ -31,7 +31,7 @@ def parse_APC_data(file_name):
     
     interpolators = {}
     for key in APC_keys:
-        interpolators[key] = LinearNDInterpolator(list(zip(data["Thrust_lbf"],data["V_fps"])),data[key])
+        interpolators[key] = LinearNDInterpolator(list(zip(x,y)),data[key])
         
     def APC_interpolator(RPM, J):
         return {key: interpolators[key](RPM,J) for key in APC_keys}
