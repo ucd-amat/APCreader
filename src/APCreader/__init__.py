@@ -31,15 +31,20 @@ def parse_APC_data(file_name):
     
     interpolators = {}
     for key in APC_keys:
-        interpolators[key] = LinearNDInterpolator(list(zip(data["RPM"],data["V_fps"])),data[key])
+        interpolators[key] = LinearNDInterpolator(list(zip(data["Thrust_lbf"],data["V_fps"])),data[key])
         
     def APC_interpolator(RPM, J):
         return {key: interpolators[key](RPM,J) for key in APC_keys}
     
-    return APC_interpolator
+    return APC_interpolator, data
 
 if __name__ == "__main__":
     # Usage
-    file_name = 'data/PER3_16x8.dat'  # Replace with your actual filename
-    prop_performance = parse_APC_data(file_name)
-    print(prop_performance(1000,0.5))
+    import matplotlib.pyplot as plt
+    file_name = '../../data/PER3_16x8.dat'  # Replace with your actual filename
+    prop_performance, data = parse_APC_data(file_name)
+    plt.figure()
+    plt.tricontourf(data["V_fps"],data["Thrust_lbf"], data["RPM"])
+    plt.colorbar()
+    plt.show()
+    # print(prop_performance(1000,0.5))
