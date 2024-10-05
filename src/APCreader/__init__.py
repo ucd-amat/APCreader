@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.interpolate import LinearNDInterpolator
 
 def parse_APC_data(file_name):
-    APC_keys = ["V_mph","J","Pe","Ct", "Cp", "PWR_hp", "Torque_inlbf", "Thrust_lbf", "PWR_W", "Torque_Nm", "Thrust_N", "THR/PWR_gpW", "Mach", "Reyn", "FOM"]
+    APC_keys = ["V_fps","J","Pe","Ct", "Cp", "PWR_hp", "Torque_inlbf", "Thrust_lbf", "PWR_W", "Torque_Nm", "Thrust_N", "THR/PWR_gpW", "Mach", "Reyn", "FOM"]
     data = {key:[] for key in ["RPM"]+APC_keys}
     # read filename
     with open(file_name, 'r') as f:
@@ -24,19 +24,14 @@ def parse_APC_data(file_name):
         for line in lines[rpm_index[i]+3: final_idx]:
             data["RPM"].append(rpm)
             for key, col in zip(APC_keys, map(float, line.split())):
-                data[key].append(col)
-        
-        # for key in APC_keys:
-        #     data["RPM"].append(0)
-        #     data[key].append(0)         
+                data[key].append(col)       
         
     data = {k:np.array(v) for k,v in data.items()}
-
+    data["V_fps"] = data["V_fps"]*1.466667 # Changes MPH to Ft/s
     
-    # print(data)
     interpolators = {}
     for key in APC_keys:
-        interpolators[key] = LinearNDInterpolator(list(zip(data["RPM"],data["J"])),data[key])
+        interpolators[key] = LinearNDInterpolator(list(zip(data["RPM"],data["V_fps"])),data[key])
         
     def APC_interpolator(RPM, J):
         return {key: interpolators[key](RPM,J) for key in APC_keys}
