@@ -34,7 +34,7 @@ def parse_APC_data(file_name, x = "Thrust_lbf", y = "V_fps"):
         interpolators[key] = LinearNDInterpolator(list(zip(data[x],data[y])),data[key])
         
     def APC_interpolator(RPM, J):
-        return {key: interpolators[key](RPM,J) for key in APC_keys}
+        return {key: interpolators[key](RPM,J) for key in ["RPM"]+APC_keys}
     
     return APC_interpolator, data
 
