@@ -30,7 +30,7 @@ def parse_APC_data(file_name, x = "Thrust_lbf", y = "V_fps"):
     data["V_fps"] = data["V_fps"]*1.466667 # Changes MPH to Ft/s
     
     interpolators = {}
-    for key in APC_keys:
+    for key in ["RPM"]+APC_keys:
         interpolators[key] = LinearNDInterpolator(list(zip(data[x],data[y])),data[key])
         
     def APC_interpolator(RPM, J):
